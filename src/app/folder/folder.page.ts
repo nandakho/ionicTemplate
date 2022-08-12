@@ -14,7 +14,9 @@ export class FolderPage implements OnInit {
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id');
+  }
+  
+  toast(){
     Toast.show({text:this.folder+" shown!"});
   }
-
 }
