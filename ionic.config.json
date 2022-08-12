@@ -1,0 +1,8 @@
+{
+  "name": "cam",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "f3e8db6b"
+}
