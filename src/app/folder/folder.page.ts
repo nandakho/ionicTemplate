@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Toast } from '@capacitor/toast';
+import { MiscService } from '../services/misc.service';
 
 @Component({
   selector: 'app-folder',
@@ -10,13 +10,16 @@ import { Toast } from '@capacitor/toast';
 export class FolderPage implements OnInit {
   public folder: string;
 
-  constructor(private activatedRoute: ActivatedRoute) { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private misc: MiscService
+  ) { }
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id');
   }
-  
+
   toast(){
-    Toast.show({text:this.folder+" shown!"});
+    this.misc.showToast(this.folder);
   }
 }
