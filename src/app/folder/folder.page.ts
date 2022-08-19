@@ -9,6 +9,7 @@ import { MiscService } from '../services/misc.service';
 })
 export class FolderPage implements OnInit {
   public folder: string;
+  private count: string="";
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -20,6 +21,7 @@ export class FolderPage implements OnInit {
   }
 
   toast(){
-    this.misc.showToast(this.folder);
+    this.count+="@@@@@ @@@@@ ";
+    this.misc.showToast(this.count+" "+this.folder+" shown.");
   }
 }

@@ -1,25 +1,33 @@
 import { Injectable } from '@angular/core';
-import { Toast } from '@capacitor/toast';
+import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MiscService {
-
-  constructor() { }
-
-  showToast(message){
-    var toastExist = document.getElementsByTagName("pwa-toast").length;
-    if(toastExist>0){
-      const prevHeight = document.getElementsByTagName("pwa-toast").item(toastExist-1).getBoundingClientRect().height;
-      for (let index = 0; index < toastExist; index++) {
-        const element = document.getElementsByTagName("pwa-toast").item(index).getBoundingClientRect();
-        document.getElementsByTagName("pwa-toast").item(index).style.position = "fixed";
-        document.getElementsByTagName("pwa-toast").item(index).style.top = String(element.top-(prevHeight*2)-10)+"px";
+  
+  constructor(private toast: ToastController) { }
+  showToast(message:string,duration:number=2000){
+    var allToast = document.querySelectorAll('ion-toast');
+    if(allToast.length>0){
+      var prevHeight = allToast.item(allToast.length-1).shadowRoot.children.item(0).getBoundingClientRect().height;
+      for (let index = 0; index < allToast.length; index++) {
+        const element = allToast.item(index).getBoundingClientRect();
+        allToast.item(index).style.position = "fixed";
+        allToast.item(index).style.top = String(element.top-(prevHeight)-2)+"px";
       }
     }
-    Toast.show({
-      text: message
+    this.toast.create({message:message,duration:duration}).then(newToast=>{
+      newToast.present().then(()=>{
+        var newHeight = newToast.shadowRoot.children.item(0).getBoundingClientRect().height;
+        if(newHeight!=prevHeight){
+          for (let index = 0; index < allToast.length; index++) {
+            const element = allToast.item(index).getBoundingClientRect();
+            allToast.item(index).style.position = "fixed";
+            allToast.item(index).style.top = String(element.top-(Math.abs(newHeight-prevHeight)))+"px";
+          }
+        }
+      });
     });
   }
 }
