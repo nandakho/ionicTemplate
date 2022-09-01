@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
+import { CameraComponent } from '../components/camera/camera.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MiscService {
-  
-  constructor(private toast: ToastController) { }
+  camActive: boolean = false;
+
+  constructor(
+    private toast: ToastController,
+    private modal: ModalController
+  ) { }
   showToast(message:string,duration:number=2000){
     var allToast = document.querySelectorAll('ion-toast');
     if(allToast.length>0){
@@ -29,5 +34,22 @@ export class MiscService {
         }
       });
     });
+  }
+
+  async openCam(){
+    const modal = await this.modal.create({
+      component: CameraComponent,
+      animated: true
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        console.log(data.data);
+        this.showToast("Disimpan");
+      } else {
+        this.showToast("Dibatalkan");
+      }
+      this.camActive = false;
+    });
+    return await modal.present();
   }
 }
