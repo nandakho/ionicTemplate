@@ -10,6 +10,7 @@ import { MiscService } from 'src/app/services/misc.service';
 })
 export class CameraComponent implements OnInit {
   imageBase64: string;
+  capturing: boolean;
   constructor(
     private modal: ModalController,
     private misc: MiscService
@@ -17,22 +18,34 @@ export class CameraComponent implements OnInit {
 
   ngOnInit() {
     this.startCam().then(()=>{
-      this.misc.camActive=true;
+      this.misc.camActive = true;
+      this.capturing = false;
     }).catch(err=>{
-      console.log(err);
+      this.misc.showToast("Kamera bermasalah: "+err);
     });
   }
 
   startCam(){
     var promise = new Promise((resolve,reject)=>{
+      const subsVar = 70;
+      const paddVar = 5;
+      const dim = {
+        w:Math.floor(window.innerWidth-(2*paddVar)),
+        h:Math.floor(window.innerHeight-subsVar-(2*paddVar))
+      };
       const camOptions: CameraPreviewOptions = {
         position: 'rear',
-        parent: 'content', // the id on the ion-content
+        parent: 'camPrev',
         className: '',
         storeToFile: true,
         lockAndroidOrientation: true,
-        enableZoom: true
-      }
+        enableZoom: true,
+        toBack: false,
+        height: dim.h,
+        width: dim.w,
+        x: paddVar,
+        y: paddVar
+      };
       CameraPreview.start(camOptions).then(()=>{
         resolve(true);
       }).catch(err=>{
@@ -43,6 +56,7 @@ export class CameraComponent implements OnInit {
   }
 
   takePicture() {
+    this.capturing = true;
     const cameraPreviewPictureOptions: CameraPreviewPictureOptions = {
       quality: 100
     };
@@ -54,6 +68,7 @@ export class CameraComponent implements OnInit {
 
   stopCamera() {
     CameraPreview.stop().then(()=>{
+      this.capturing = false;
       this.misc.camActive = false;
       this.modal.dismiss(this.imageBase64);
     });

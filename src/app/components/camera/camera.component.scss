@@ -13,7 +13,7 @@ ion-icon {
 
 #capture {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
     left: calc(50% - 25px);
     width: 50px;
     height: 50px;
@@ -22,8 +22,8 @@ ion-icon {
 
 #flip {
     position: absolute;
-    bottom: 30px;
-    left: calc(50% + 125px);
+    bottom: 10px;
+    left: calc(75% - 25px);
     width: 50px;
     height: 50px;
     z-index: 99999;
@@ -31,8 +31,8 @@ ion-icon {
 
 #close {
     position: absolute;
-    bottom: 30px;
-    left: calc(50% - 175px);
+    bottom: 10px;
+    left: calc(25% - 25px);
     width: 50px;
     height: 50px;
     z-index: 99999;

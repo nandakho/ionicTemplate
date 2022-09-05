@@ -39,7 +39,8 @@ export class MiscService {
   async openCam(){
     const modal = await this.modal.create({
       component: CameraComponent,
-      animated: true
+      animated: true,
+      backdropDismiss: false
     });
     modal.onDidDismiss().then((data) => {
       if (data.data) {
