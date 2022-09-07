@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CameraPreview, CameraPreviewOptions, CameraPreviewPictureOptions } from '@capacitor-community/camera-preview';
-import { ModalController } from '@ionic/angular';
+import { ModalController, NavParams } from '@ionic/angular';
 import { MiscService } from 'src/app/services/misc.service';
 
 @Component({
@@ -9,36 +9,54 @@ import { MiscService } from 'src/app/services/misc.service';
   styleUrls: ['./camera.component.scss'],
 })
 export class CameraComponent implements OnInit {
+  @ViewChild('hiddenCanvas') editCanvas;
   imageBase64: string;
   capturing: boolean;
+  option: picWM;
+  orient: string;
+  orientChange: any;
+  lastPos: string;
+
   constructor(
     private modal: ModalController,
-    private misc: MiscService
+    private misc: MiscService,
+    private params: NavParams
   ) { }
 
   ngOnInit() {
-    this.startCam().then(()=>{
+    this.orient = screen.orientation.type.split("-")[0];
+    this.lastPos = 'rear';
+    this.startCam(this.lastPos).then(()=>{
+      screen.orientation.addEventListener("change",this.orientChange = (ev) =>{
+        this.orient = ev.target.type.split("-")[0];
+        CameraPreview.stop().finally(()=>{
+          this.startCam(this.lastPos);
+        });
+      });
+      this.option = this.params.get('option');
       this.misc.camActive = true;
       this.capturing = false;
     }).catch(err=>{
-      this.misc.showToast("Kamera bermasalah: "+err);
+      this.misc.showToast(err);
     });
   }
 
-  startCam(){
+  startCam(lastPos = 'rear'){
     var promise = new Promise((resolve,reject)=>{
       const subsVar = 70;
       const paddVar = 5;
-      const dim = {
+      const dim = this.orient=="portrait"?{
         w:Math.floor(window.innerWidth-(2*paddVar)),
         h:Math.floor(window.innerHeight-subsVar-(2*paddVar))
+      }:{
+        w:Math.floor(window.innerWidth-subsVar-(2*paddVar)),
+        h:Math.floor(window.innerHeight-(2*paddVar))
       };
       const camOptions: CameraPreviewOptions = {
-        position: 'rear',
+        position: lastPos,
         parent: 'camPrev',
-        className: '',
-        storeToFile: true,
-        lockAndroidOrientation: true,
+        disableExifHeaderStripping: false,
+        lockAndroidOrientation: false,
         enableZoom: true,
         toBack: false,
         height: dim.h,
@@ -61,13 +79,51 @@ export class CameraComponent implements OnInit {
       quality: 100
     };
     CameraPreview.capture(cameraPreviewPictureOptions).then(result=>{
-      this.imageBase64 = `data:image/jpeg;base64,${result.value}`;
-      this.stopCamera();
+      const angle = this.orient=="landscape"&&this.lastPos=="front"?180:0;
+      var canvasElement = this.editCanvas.nativeElement;
+      var background = new Image();
+      background.src = "data:image/jpeg;base64,"+result.value;
+      let ctx = canvasElement.getContext('2d');
+      background.onload = () => {
+        ctx.canvas.width  = background.width;
+        ctx.canvas.height = background.height;
+        ctx.translate(background.width / 2, background.height / 2);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.drawImage(background, background.width / -2, background.height / -2);
+        ctx.lineWidth = 5;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#000000";
+        if(this.option.time){
+          const locY = this.option.coord?background.height / 2 - 70:background.height / 2 - 30;
+          const timestamp = this.misc.curTimestamp();
+          var tsfont = "bold "+Math.floor(ctx.canvas.width/timestamp.length)+"px Calibri";
+          ctx.font = tsfont;
+          var width = ctx.measureText(timestamp);
+          ctx.rotate(angle * Math.PI / 180);
+          ctx.strokeText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.fillText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.rotate(angle * Math.PI / 180);
+        }
+        if(this.option.coord){
+          const locY = this.option.time?background.height / 2 - 20:background.height / 2 - 30;
+          const timestamp = this.misc.curTimestamp()+"XX";
+          var tsfont = "bold "+Math.floor(ctx.canvas.width/timestamp.length)+"px Calibri";
+          ctx.font = tsfont;
+          var width = ctx.measureText(timestamp);
+          ctx.rotate(angle * Math.PI / 180);
+          ctx.strokeText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.fillText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.rotate(angle * Math.PI / 180);
+        }
+        this.imageBase64 = canvasElement.toDataURL('image/jpeg');
+        this.stopCamera();
+      }
     });
   }
 
   stopCamera() {
     CameraPreview.stop().then(()=>{
+      screen.orientation.removeEventListener("change",this.orientChange);
       this.capturing = false;
       this.misc.camActive = false;
       this.modal.dismiss(this.imageBase64);
@@ -75,12 +131,17 @@ export class CameraComponent implements OnInit {
   }
 
   flipCamera() {
-    CameraPreview.flip().then(acc=>{
-      console.log(acc);
+    CameraPreview.flip().then(()=>{
+      this.lastPos = this.lastPos=='rear'?'front':'rear';
     },rej=>{
-      console.log(rej);
+      this.misc.showToast(rej);
     }).catch(err=>{
-      console.log(err);
+      this.misc.showToast(err);
     });
   }
+}
+
+export interface picWM {
+  time?: boolean;
+  coord?: boolean;
 }

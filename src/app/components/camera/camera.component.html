@@ -1,14 +1,18 @@
+<ion-content hidden>
+  <canvas #hiddenCanvas></canvas>
+</ion-content> 
+
 <ion-content id="camPrev" [fullscreen]="true">
   <div *ngIf="misc.camActive">
-    <ion-button [disabled]="capturing" (click)="stopCamera()" color="light" expand="block" id="close">
+    <ion-button [ngClass]="orient" [disabled]="capturing" (click)="stopCamera()" color="light" expand="block" id="close">
       <ion-icon slot="icon-only" name="close-circle"></ion-icon>
     </ion-button>
 
-    <ion-button [disabled]="capturing" (click)="takePicture()" color="light" expand="block" id="capture">
+    <ion-button [ngClass]="orient" [disabled]="capturing" (click)="takePicture()" color="light" expand="block" id="capture">
       <ion-icon slot="icon-only" name="camera"></ion-icon>
     </ion-button>
 
-    <ion-button [disabled]="capturing" (click)="flipCamera()" color="light" expand="block" id="flip">
+    <ion-button [ngClass]="orient" [disabled]="capturing" (click)="flipCamera()" color="light" expand="block" id="flip">
       <ion-icon slot="icon-only" name="repeat"></ion-icon>
     </ion-button>
   </div>

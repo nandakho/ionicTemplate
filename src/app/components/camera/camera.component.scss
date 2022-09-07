@@ -11,7 +11,34 @@ ion-icon {
     font-size: 30px;
 }
 
-#capture {
+#capture.landscape {
+    position: absolute;
+    right: 10px;
+    bottom: calc(50% - 25px);
+    width: 50px;
+    height: 50px;
+    z-index: 99999;
+}
+
+#flip.landscape {
+    position: absolute;
+    right: 10px;
+    bottom: calc(75% - 25px);
+    width: 50px;
+    height: 50px;
+    z-index: 99999;
+}
+
+#close.landscape {
+    position: absolute;
+    right: 10px;
+    bottom: calc(25% - 25px);
+    width: 50px;
+    height: 50px;
+    z-index: 99999;
+}
+
+#capture.portrait {
     position: absolute;
     bottom: 10px;
     left: calc(50% - 25px);
@@ -20,7 +47,7 @@ ion-icon {
     z-index: 99999;
 }
 
-#flip {
+#flip.portrait {
     position: absolute;
     bottom: 10px;
     left: calc(75% - 25px);
@@ -29,7 +56,7 @@ ion-icon {
     z-index: 99999;
 }
 
-#close {
+#close.portrait {
     position: absolute;
     bottom: 10px;
     left: calc(25% - 25px);
