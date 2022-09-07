@@ -19,6 +19,10 @@
     <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
   </div>
 
+  <div *ngIf="img">
+    <img [src]="img">
+  </div>
+
   <ion-button (click)="toast()" class="wrapper">Show Toast</ion-button>
-  <ion-button (click)="misc.openCam()" class="wrapper">Open Cam</ion-button>
+  <ion-button (click)="openCam()" class="wrapper">Open Cam</ion-button>
 </ion-content>

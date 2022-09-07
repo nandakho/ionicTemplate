@@ -10,6 +10,7 @@ import { MiscService } from '../services/misc.service';
 export class FolderPage implements OnInit {
   public folder: string;
   private count: string="";
+  img;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -23,5 +24,12 @@ export class FolderPage implements OnInit {
   toast(){
     this.count+="@@@@@ @@@@@ ";
     this.misc.showToast(this.count+" "+this.folder+" shown.");
+  }
+
+  openCam(){
+    this.misc.openCam({time:true,coord:false}).then(res=>{
+      console.log(res);
+      this.img = res;
+    });
   }
 }
