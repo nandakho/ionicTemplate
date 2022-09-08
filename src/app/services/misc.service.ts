@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ToastController, ModalController } from '@ionic/angular';
-import { CameraComponent, picWM } from '../components/camera/camera.component';
-import { File } from '@awesome-cordova-plugins/file/ngx';
+import { CameraComponent, picOpt } from '../components/camera/camera.component';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +11,7 @@ export class MiscService {
 
   constructor(
     private toast: ToastController,
-    private modal: ModalController,
-    private file: File
+    private modal: ModalController
   ) { }
 
   generateName(){
@@ -51,29 +50,18 @@ export class MiscService {
 
   writeImage(imageData){
     var promise = new Promise((resolve,reject)=>{
-      this.file.writeFile(this.file.externalDataDirectory,this.generateName(),this.b64toBlob(imageData,"image/jpeg")).then(()=>{
-        resolve(true);
+      Filesystem.writeFile({
+        path: 'ready/'+this.generateName(),
+        data: imageData,
+        directory: Directory.External,
+        recursive: true
+      }).then((uri)=>{
+        resolve(uri);
       }).catch((err)=>{
         reject(err);
       });
     });
     return promise;
-  }
-
-  b64toBlob(b64Data, contentType='', sliceSize=512){
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-    const blob = new Blob(byteArrays, {type: contentType});
-    return blob;
   }
 
   showToast(message:string,duration:number=2000){
@@ -100,7 +88,7 @@ export class MiscService {
     });
   }
 
-  openCam(opt:picWM){
+  openCam(opt:picOpt){
     var promise = new Promise(async (resolve,reject)=>{
       const modal = await this.modal.create({
         component: CameraComponent,
@@ -111,8 +99,15 @@ export class MiscService {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           var dataURL = data.data.split(",");
-          this.writeImage(dataURL[1]);
-          resolve(dataURL);
+          this.writeImage(dataURL[1]).then(uri=>{
+            if(opt.returnType=="Base64"){
+              resolve(data.data);
+            } else {
+              resolve(uri);
+            }
+          }).catch(err=>{
+            reject(err);
+          });
         } else {
           reject("Dibatalkan");
         }

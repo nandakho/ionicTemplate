@@ -12,7 +12,7 @@ export class CameraComponent implements OnInit {
   @ViewChild('hiddenCanvas') editCanvas;
   imageBase64: string;
   capturing: boolean;
-  option: picWM;
+  option: picOpt;
   orient: string;
   orientChange: any;
   lastPos: string;
@@ -141,7 +141,8 @@ export class CameraComponent implements OnInit {
   }
 }
 
-export interface picWM {
+export interface picOpt {
   time?: boolean;
   coord?: boolean;
+  returnType?: "URI"|"Base64";
 }

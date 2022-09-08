@@ -27,9 +27,8 @@ export class FolderPage implements OnInit {
   }
 
   openCam(){
-    this.misc.openCam({time:true,coord:false}).then(res=>{
-      console.log(res);
-      this.img = res;
+    this.misc.openCam({time:true,coord:false,returnType:"Base64"}).then(res=>{
+      this.img = res; //for testing
     });
   }
 }
