@@ -44,7 +44,7 @@ export class CameraComponent implements OnInit {
   startCam(lastPos:CameraPosition = 'rear'){
     var promise = new Promise((resolve,reject)=>{
       const subsVar = 70;
-      const paddVar = 5;
+      const paddVar = 10;
       const dim = this.orient=="portrait"?{
         w:Math.floor(window.innerWidth-(2*paddVar)),
         h:Math.floor(window.innerHeight-subsVar-(2*paddVar))

@@ -2,7 +2,7 @@
   <canvas #hiddenCanvas></canvas>
 </ion-content> 
 
-<ion-content id="camPrev" [fullscreen]="true">
+<ion-content id="camPrev" [fullscreen]="true" style="background-color: #505050;">
   <div *ngIf="misc.camActive">
     <ion-button [ngClass]="orient" [disabled]="capturing" (click)="stopCamera()" color="light" expand="block" id="close">
       <ion-icon slot="icon-only" name="close-circle"></ion-icon>
