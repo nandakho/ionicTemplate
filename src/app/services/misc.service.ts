@@ -57,10 +57,10 @@ export class MiscService {
     return now_date + " " + now_month + " " + now_year + ", " + now_hour + ":" + now_min + ":" + now_sec;
   }
 
-  writeImage(imageData){
+  writeImage(imageData,targetFolder=""){
     var promise = new Promise((resolve,reject)=>{
       Filesystem.writeFile({
-        path: this.defaultPath+this.packageName+'ready/'+this.generateName(),
+        path: this.defaultPath+this.packageName+targetFolder+this.generateName(),
         data: imageData,
         recursive: true
       }).then((uri)=>{
@@ -96,7 +96,7 @@ export class MiscService {
     });
   }
 
-  openCam(opt:picOpt){
+  openCam(opt:picOpt,targetFolder=""){
     var promise = new Promise(async (resolve,reject)=>{
       const modal = await this.modal.create({
         component: CameraComponent,
@@ -107,7 +107,7 @@ export class MiscService {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           var dataURL = data.data.split(",");
-          this.writeImage(dataURL[1]).then(uri=>{
+          this.writeImage(dataURL[1],targetFolder).then(uri=>{
             if(opt.returnType=="Base64"){
               resolve(data.data);
             } else {
