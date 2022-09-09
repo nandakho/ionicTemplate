@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { CameraPreview, CameraPreviewOptions, CameraPreviewPictureOptions } from '@capacitor-community/camera-preview';
+import { CameraPosition, CameraPreview, CameraPreviewOptions, CameraPreviewPictureOptions } from '@capacitor-community/camera-preview';
 import { ModalController, NavParams } from '@ionic/angular';
 import { MiscService } from 'src/app/services/misc.service';
 
@@ -15,7 +15,7 @@ export class CameraComponent implements OnInit {
   option: picOpt;
   orient: string;
   orientChange: any;
-  lastPos: string;
+  lastPos: CameraPosition;
 
   constructor(
     private modal: ModalController,
@@ -41,7 +41,7 @@ export class CameraComponent implements OnInit {
     });
   }
 
-  startCam(lastPos = 'rear'){
+  startCam(lastPos:CameraPosition = 'rear'){
     var promise = new Promise((resolve,reject)=>{
       const subsVar = 70;
       const paddVar = 5;
@@ -96,7 +96,8 @@ export class CameraComponent implements OnInit {
         if(this.option.time){
           const locY = this.option.coord?background.height / 2 - 70:background.height / 2 - 30;
           const timestamp = this.misc.curTimestamp();
-          var tsfont = "bold "+Math.floor(ctx.canvas.width/timestamp.length)+"px Calibri";
+          const fontSize = Math.floor(ctx.canvas.width/timestamp.length)<=Math.floor(ctx.canvas.height/timestamp.length)?Math.floor(ctx.canvas.width/timestamp.length):Math.floor(ctx.canvas.height/timestamp.length);
+          var tsfont = "bold "+fontSize+"px Calibri";
           ctx.font = tsfont;
           var width = ctx.measureText(timestamp);
           ctx.rotate(angle * Math.PI / 180);
@@ -107,7 +108,8 @@ export class CameraComponent implements OnInit {
         if(this.option.coord){
           const locY = this.option.time?background.height / 2 - 20:background.height / 2 - 30;
           const timestamp = this.misc.curTimestamp()+"XX";
-          var tsfont = "bold "+Math.floor(ctx.canvas.width/timestamp.length)+"px Calibri";
+          const fontSize = Math.floor(ctx.canvas.width/timestamp.length)<=Math.floor(ctx.canvas.height/timestamp.length)?Math.floor(ctx.canvas.width/timestamp.length):Math.floor(ctx.canvas.height/timestamp.length);
+          var tsfont = "bold "+fontSize+"px Calibri";
           ctx.font = tsfont;
           var width = ctx.measureText(timestamp);
           ctx.rotate(angle * Math.PI / 180);

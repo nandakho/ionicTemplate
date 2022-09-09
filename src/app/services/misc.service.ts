@@ -1,18 +1,27 @@
 import { Injectable } from '@angular/core';
 import { ToastController, ModalController } from '@ionic/angular';
 import { CameraComponent, picOpt } from '../components/camera/camera.component';
-import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Filesystem } from '@capacitor/filesystem';
+import { App } from '@capacitor/app';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MiscService {
   camActive: boolean = false;
+  defaultPath: string = "file:///storage/emulated/0/Android/media/";
+  packageName: string = "";
 
   constructor(
     private toast: ToastController,
     private modal: ModalController
-  ) { }
+  ) {
+    if(this.packageName==""){
+      App.getInfo().then(app=>{
+        this.packageName = app.id+"/";
+      });
+    }
+  }
 
   generateName(){
     var date = new Date().toISOString();
@@ -51,9 +60,8 @@ export class MiscService {
   writeImage(imageData){
     var promise = new Promise((resolve,reject)=>{
       Filesystem.writeFile({
-        path: 'ready/'+this.generateName(),
+        path: this.defaultPath+this.packageName+'ready/'+this.generateName(),
         data: imageData,
-        directory: Directory.External,
         recursive: true
       }).then((uri)=>{
         resolve(uri);
