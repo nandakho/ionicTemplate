@@ -52,7 +52,7 @@ export class MiscService {
     var promise = new Promise((resolve,reject)=>{
       Filesystem.writeFile({
         path: targetFolder+this.generateName(),
-        directory: Directory.ExternalStorage,
+        directory: Directory.External,
         data: imageData,
         recursive: true
       }).then((uri)=>{
