@@ -7,23 +7,7 @@ import { Preferences } from '@capacitor/preferences';
 export class ConfigService {
   constructor() { }
 
-  init(){
-  }
-
-  checkLogin(){
-    var promise = new Promise((resolve,reject)=>{
-      Preferences.get({
-        key:'currentUser'
-      }).then(log=>{
-        resolve(log);
-      }).catch(err=>{
-        reject(err);
-      });
-    });
-    return promise;
-  }
-
-  writeConfig(key:string,value:any){
+  writeConfig(key:string,value:string){
     var promise = new Promise((resolve,reject)=>{
       Preferences.set({
         key:key,
@@ -42,7 +26,7 @@ export class ConfigService {
       Preferences.get({
         key:key
       }).then(config=>{
-        resolve(config);
+        resolve(config.value);
       }).catch(err=>{
         reject(err);
       })

@@ -1,0 +1,40 @@
+.smaller{
+    font-size: 10px;
+  }
+  
+  @keyframes slideUp {
+    0% {
+      opacity:0%;
+      transform: translateY(+50%);
+    }
+    100% {
+      opacity: 100%;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity:0%;
+    }
+    100% {
+      opacity:100%;
+    }
+  }
+  
+  .intro-floatUp {
+    animation: 0.8s cubic-bezier(0.39, 0.58, 0.57, 1) 0s 1 forwards slideUp;
+  }
+  
+  .wait-floatUp {
+    display:'none';
+  }
+  
+  .intro-fadeIn {
+    opacity: 0%;
+    animation: 0.7s ease-out 0.8s 1 forwards fadeIn;
+  }
+    
+  .wait-fadeIn {
+    opacity: 0%;
+  }
