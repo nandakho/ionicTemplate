@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SHA1 } from 'crypto-js';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +9,18 @@ export class AuthService {
   public isLogin: boolean;
   public loggedUser: currentUser;
 
-  constructor() {
-    console.log(this.saltedPass("admin"));
+  constructor(private config: ConfigService) {
+    this.init();
   }
   
+  init(){
+    this.config.checkLogin().then(y=>{
+      console.log(y);
+    }).catch(e=>{
+      console.log(e);
+    });
+  }
+
   saltedPass(pass:string){
     return SHA1(pass+pass).toString();
   }
