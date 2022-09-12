@@ -5,14 +5,19 @@ import { Component } from '@angular/core';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  public appPages = [
-    { title: 'Inbox', url: '/folder/Inbox', icon: 'mail' },
-    { title: 'Outbox', url: '/folder/Outbox', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
-    { title: 'Archived', url: '/folder/Archived', icon: 'archive' },
-    { title: 'Trash', url: '/folder/Trash', icon: 'trash' },
-    { title: 'Spam', url: '/folder/Spam', icon: 'warning' },
-  ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+  public user = 'Nama User';
+  public role = 'tes'
+  public app = {
+    header: this.user,
+    sub_header: "Notes",
+    pages:[
+      { title: 'Inbox', url: '/folder/Inbox', icon: 'mail', auth:['tas','tis'] },
+      { title: 'Outbox', url: '/folder/Outbox', icon: 'paper-plane', auth:['tus'] },
+      { title: 'Favorites', url: '/folder/Favorites', icon: 'heart', auth:['tes'] },
+      { title: 'Archived', url: '/folder/Archived', icon: 'archive', auth:['tos'] },
+      { title: 'Trash', url: '/folder/Trash', icon: 'trash', auth:[false] },
+      { title: 'Spam', url: '/folder/Spam', icon: 'warning', auth:[false] },
+    ]
+  };
   constructor() {}
 }
