@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService, loginForm, currentUser } from 'src/app/services/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -6,10 +7,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   public user = 'Nama User';
-  public role = 'tes'
+  public role = 'tes';
+  public unit = ['ALL'];
   public app = {
-    header: this.user,
-    sub_header: "Notes",
+    username: this.user,
+    role: this.role,
+    unit: this.unit,
     pages:[
       { title: 'Inbox', url: '/folder/Inbox', icon: 'mail', auth:['tas','tis'] },
       { title: 'Outbox', url: '/folder/Outbox', icon: 'paper-plane', auth:['tus'] },
@@ -19,5 +22,7 @@ export class AppComponent {
       { title: 'Spam', url: '/folder/Spam', icon: 'warning', auth:[false] },
     ]
   };
-  constructor() {}
+  constructor(
+    public auth: AuthService
+  ) { }
 }

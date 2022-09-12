@@ -3,8 +3,8 @@
     <ion-menu contentId="main-content" type="overlay">
       <ion-content>
         <ion-list id="menu-list">
-          <ion-list-header>{{app.header}}</ion-list-header>
-          <ion-note>{{app.sub_header}}</ion-note>
+          <ion-list-header>{{app.username}}</ion-list-header>
+          <ion-note>Role: {{app.role}}<br>Unit: {{app.unit.join(" ")}}</ion-note>
 
           <ion-menu-toggle auto-hide="false" *ngFor="let p of app.pages; let i = index">
             <ion-item *ngIf="p.auth.includes(role)||p.auth[0]==false" routerDirection="forward" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
