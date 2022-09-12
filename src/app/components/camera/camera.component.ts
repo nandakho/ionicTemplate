@@ -143,8 +143,10 @@ export class CameraComponent implements OnInit {
   }
 }
 
+type picType = "URI"|"Base64";
+
 export interface picOpt {
   time?: boolean;
   coord?: boolean;
-  returnType?: "URI"|"Base64";
+  returnType?: picType;
 }
