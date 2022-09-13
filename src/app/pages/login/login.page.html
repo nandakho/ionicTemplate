@@ -35,5 +35,5 @@
       </ion-row>
     </ion-grid>
   </form>
-  <div [ngClass]="animRdy?'intro-fadeIn':'wait-fadeIn'" align="center" class="smaller" style="color:black">Copyright @{{currYear}} - Version {{db.appVer.major + '.' + db.appVer.minor + '.' + db.appVer.patch}}</div>
+  <div [ngClass]="animRdy?'intro-fadeIn':'wait-fadeIn'" align="center" class="smaller" style="color:black">Copyright @{{currYear}} - Version {{db.versionString()}}</div>
 </ion-content>
