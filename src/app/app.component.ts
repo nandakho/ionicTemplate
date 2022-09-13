@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService, loginForm, currentUser } from 'src/app/services/auth.service';
+import { DbService } from './services/db.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -22,7 +22,5 @@ export class AppComponent {
       { title: 'Spam', url: '/folder/Spam', icon: 'warning', auth:[false] },
     ]
   };
-  constructor(
-    public auth: AuthService
-  ) { }
+  constructor(private db: DbService) { }
 }
