@@ -7,30 +7,30 @@ import { Preferences } from '@capacitor/preferences';
 export class ConfigService {
   constructor() { }
 
-  writeConfig(key:string,value:string){
-    var promise = new Promise((resolve,reject)=>{
-      Preferences.set({
-        key:key,
-        value: value
-      }).then(()=>{
-        resolve(true);
-      }).catch(err=>{
-        reject(err);
-      })
-    });
-    return promise;
+  async writeConfig(key:string,value:Object):Promise<boolean>{
+    try {
+      await Preferences.set({key:key,value:JSON.stringify(value)});
+      return Promise.resolve(true);
+    } catch (err) {
+      return Promise.reject(new Error(err));
+    }
   }
 
-  readConfig(key:string){
-    var promise = new Promise((resolve,reject)=>{
-      Preferences.get({
-        key:key
-      }).then(config=>{
-        resolve(config.value);
-      }).catch(err=>{
-        reject(err);
-      })
-    });
-    return promise;
+  async readConfig(key:string):Promise<Object>{
+    try {
+      const res = await Preferences.get({key:key});
+      return Promise.resolve(JSON.parse(res.value));
+    } catch (err) {
+      return Promise.reject(new Error(err));
+    }
+  }
+
+  async deleteConfig(key:string):Promise<boolean>{
+    try {
+      await Preferences.remove({key:key});
+      return Promise.resolve(true);
+    } catch (err) {
+      return Promise.reject(new Error(err));
+    }
   }
 }

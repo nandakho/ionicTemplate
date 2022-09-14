@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MiscService } from 'src/app/services/misc.service';
-import { DbService } from 'src/app/services/db.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { ConfigService } from 'src/app/services/config.service';
+import { DbService } from 'src/app/services/db.service';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +10,6 @@ import { ConfigService } from 'src/app/services/config.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  isLoggedIn: boolean;
   username: string;
   password: string;
   currYear: number = new Date().getFullYear();
@@ -22,13 +20,19 @@ export class LoginPage implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private misc: MiscService,
-    private db: DbService,
     private auth: AuthService,
-    private config: ConfigService,
+    private db: DbService
   ){}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loginForm = this.formBuilder.group({});
+    const savedUser = await this.auth.savedUser();
+    if(savedUser.logStatus=="expired"){
+      this.misc.showToast("Login expired - Silahkan login kembali");
+    }
+    if(savedUser.logStatus=="ok"){
+      this.username = savedUser.username;
+    }
   }
 
   ionViewDidEnter(){
@@ -37,36 +41,16 @@ export class LoginPage implements OnInit {
     }, 100);
   }
 
-  savedUser(){
-    this.config.readConfig('currentUser').then(resp=>{
-      console.log(resp);
-    }).catch(err=>{
-      console.log(err);
-    });
-    /* 
-    if(currentUser){
-      var datenow = Date.now();
-      var daypassed = Math.round(Math.abs(datenow-resp.login))/(24 * 60 * 60 * 1000);
-      if(daypassed>1){
-        this.misc.showToast("Login expired - Silahkan login kembali");
-        this.isLoggedIn=false;
-        this.auth.logout();
-      } else {
-        this.username=resp['username'];
-        this.isLoggedIn=true;
-      }
-    } */
-  }
 
-  loginUser(formlogin){
-    console.log(formlogin.value);
-    this.auth.login(formlogin.value);
-  }
-
-  logout(){
-    this.isLoggedIn=false;
-    this.username="";
-    this.auth.logout();
+  async loginUser(formlogin){
+    if(await this.auth.login(formlogin.value)){
+      console.log("LOGIN SUKSES");
+      // Move to home page
+    } else {
+      this.misc.showToast("Username atau Password salah!");
+      console.log("LOGIN FAIL");
+      // Rejected
+    };
   }
 
   public toggleTextPassword(): void{
