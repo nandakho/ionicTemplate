@@ -46,19 +46,10 @@ export class DbService {
           if(ok.result==false){
             this.sql = await this.createConnection(this.dbName,false,'no-encryption',1);
             await this.sql.open();
-            let resp: any = await this.sql.execute(createSchema);
-            this.sql.query('SELECT * FROM users').then(res=>{
-              console.log(res.values);
-            });
-            console.log('$$$ ret.changes.changes in db ' + resp.changes.changes);
-            if (resp.changes.changes < 0) {
-              console.log('Execute createSchema failed');
-            }
+            await this.sql.execute(createSchema);
           }
           this.initDone = true;
-        }).catch(er=>{
-          console.log(er);
-        });
+        }).catch(()=>{});
       });
     });
   }
@@ -78,7 +69,6 @@ export class DbService {
         q += " "+opt.orderdir;
       }
     }
-    console.log(q);
     try {
       const result = await this.sql.query(q);
       return Promise.resolve(result.values);
@@ -430,12 +420,6 @@ export class DbService {
     if (this.sqlite != null) {
       try {
         const myConns = await this.sqlite.retrieveAllConnections();
-        /*
-          let keys = [...myConns.keys()];
-          keys.forEach( (value) => {
-            console.log("Connection: " + value);
-          });
-        */
         return Promise.resolve(myConns);
       } catch (err) {
         return Promise.reject(new Error(err));
@@ -639,7 +623,6 @@ export class DbService {
    */
   async copyFromAssets(overwrite?: boolean): Promise<void> {
     const mOverwrite: boolean = overwrite != null ? overwrite : true;
-    console.log(`&&&& mOverwrite ${mOverwrite}`);
     if (this.sqlite != null) {
       try {
         return Promise.resolve(await this.sqlite.copyFromAssets(mOverwrite));
