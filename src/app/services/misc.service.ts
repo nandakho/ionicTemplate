@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ToastController, ModalController } from '@ionic/angular';
 import { CameraComponent, picOpt } from '../components/camera/camera.component';
-import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +14,21 @@ export class MiscService {
     private modal: ModalController
   ) { }
 
-  generateName(){
+  /**
+   * Generate string of image name based on timestamp
+   * @returns string
+   */
+  generateName():string{
     var date = new Date().toISOString();
     var name = date.replace(/:|-|\.|Z|T/g,"") + ".jpeg";
     return name;
   }
   
-  curTimestamp(){
+  /**
+   * Generate string of timestamp
+   * @returns string
+   */
+  curTimestamp():string{
     var now = new Date(Date.now());
     if(now.getDate()<10){
       var now_date = "0" + String(now.getDate());
@@ -48,23 +56,33 @@ export class MiscService {
     return now_date + " " + now_month + " " + now_year + ", " + now_hour + ":" + now_min + ":" + now_sec;
   }
 
-  writeImage(imageData,targetFolder=""){
-    var promise = new Promise((resolve,reject)=>{
-      Filesystem.writeFile({
+  /**
+   * Write Image to External storage
+   * file:///storage/emulated/0/Android/Data/packageName/files/targetFolder
+   * @param imageData 
+   * @param targetFolder 
+   * @returns Promise<WriteFileResult>
+   */
+  async writeImage(imageData,targetFolder=""):Promise<WriteFileResult>{
+    try {
+      const uri = Filesystem.writeFile({
         path: targetFolder+this.generateName(),
         directory: Directory.External,
         data: imageData,
         recursive: true
-      }).then((uri)=>{
-        resolve(uri);
-      }).catch((err)=>{
-        reject(err);
       });
-    });
-    return promise;
+      return Promise.resolve(uri);
+    } catch(err) {
+      return Promise.reject(new Error(err));
+    }
   }
 
-  showToast(message:string,duration:number=2000){
+  /**
+   * Show toast, automatically push existing toast up if another toast is called
+   * @param message 
+   * @param duration 
+   */
+  showToast(message:string,duration:number=2000):void{
     var allToast = document.querySelectorAll('ion-toast');
     if(allToast.length>0){
       var prevHeight = allToast.item(allToast.length-1).shadowRoot.children.item(0).getBoundingClientRect().height;
@@ -88,6 +106,12 @@ export class MiscService {
     });
   }
 
+  /**
+   * Open camera preview, returning either file uri or base64 string
+   * @param opt 
+   * @param targetFolder 
+   * @returns string|WriteFileResult
+   */
   openCam(opt:picOpt,targetFolder=""){
     var promise = new Promise(async (resolve,reject)=>{
       const modal = await this.modal.create({
