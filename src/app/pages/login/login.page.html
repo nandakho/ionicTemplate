@@ -5,7 +5,7 @@
         <ion-col align-self-center size-md="6" size-lg="5" size-xs="12">
           <div [ngClass]="animRdy?'intro-floatUp':'wait-floatUp'" style="text-align:-webkit-center;opacity:0"><ion-img src='assets/image/logo.jpg' style="padding-top:25%;padding-bottom:15px;width:90%"></ion-img></div>
           <div [ngClass]="animRdy?'intro-fadeIn':'wait-fadeIn'" style="padding:10px;" *ngIf="!auth.isLoggedIn">
-            <h1 align="center" style="color:black"><b>{{appTitle}}</b></h1>
+            <h1 align="center" style="color:black"><b>{{db.appTitle}}</b></h1>
             <ion-item>
               <ion-input name="username" type="text" placeholder="Username" [(ngModel)]="username" required></ion-input>
             </ion-item>
@@ -16,7 +16,7 @@
             </ion-item>
           </div>
           <div [ngClass]="animRdy?'intro-fadeIn':'wait-fadeIn'" style="padding:10px" *ngIf="auth.isLoggedIn">
-            <h1 align="center" style="color:black"><b>{{appTitle}}</b></h1>
+            <h1 align="center" style="color:black"><b>{{db.appTitle}}</b></h1>
             <ion-item>
               <ion-input name="username" type="text" [(ngModel)]="username" readonly></ion-input>
             </ion-item>

@@ -18,6 +18,7 @@ export class DbService {
   native: boolean = false;
   dbName: string = "db";
   appVer: version;
+  appTitle: string = "General Template";
   constructor(private pf: Platform) {
     if(!this.initDone){
       App.getInfo().then((info)=>{
