@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ToastController, ModalController } from '@ionic/angular';
+import { ToastController, ModalController, NavController } from '@ionic/angular';
 import { CameraComponent, picOpt } from '../components/camera/camera.component';
 import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
 
@@ -11,7 +11,8 @@ export class MiscService {
 
   constructor(
     private toast: ToastController,
-    private modal: ModalController
+    private modal: ModalController,
+    private nav: NavController
   ) { }
 
   /**
@@ -73,6 +74,31 @@ export class MiscService {
       });
       return Promise.resolve(uri);
     } catch(err) {
+      return Promise.reject(new Error(err));
+    }
+  }
+
+  /**
+   * Navigation..
+   * @param page 
+   * @param direction 
+   * @returns Promise<void>
+   */
+  async goTo(page:string,direction:"root"|"forward"|"backward"="forward"):Promise<void>{
+    try {
+      switch(direction){
+        case "root":
+          await this.nav.navigateRoot(page);
+          break;
+        case "forward":
+          await this.nav.navigateForward(page);
+          break;
+        case "backward":
+          await this.nav.navigateBack(page);
+          break;
+      }
+      return Promise.resolve();
+    } catch (err) {
       return Promise.reject(new Error(err));
     }
   }

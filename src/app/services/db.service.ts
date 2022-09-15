@@ -16,11 +16,17 @@ export class DbService {
   platform: string;
   sqlitePlugin: any;
   native: boolean = false;
+  appVer: version = { major:0, minor:0, patch:0 };
+  //Editable
   dbName: string = "db";
-  appVer: version;
   appTitle: string = "General Template";
-  constructor(private pf: Platform) {
-    if(!this.initDone){
+  constructor(private pf: Platform) { }
+
+  /**
+   * Initialize sql & other thing
+   */
+  init(){
+    this.pf.ready().then(async () => {
       App.getInfo().then((info)=>{
         var v = info.version.split("-");
         var vnumber = v[0].split(".");
@@ -32,25 +38,16 @@ export class DbService {
           patch:parseInt(vnumber[2])
         }
         this.appVer.notes = vnotes?vnotes:null;
-        this.init();
-      });
-    }
-  }
-
-  /**
-   * Initialize sql property
-   */
-  init(){
-    this.pf.ready().then(async () => {
-      this.initializePlugin().then(async () => {
-        this.checkConnectionsConsistency().then(async ok=>{
-          if(ok.result==false){
-            this.sql = await this.createConnection(this.dbName,false,'no-encryption',1);
-            await this.sql.open();
-            await this.sql.execute(createSchema);
-          }
-          this.initDone = true;
-        }).catch(()=>{});
+        this.initializePlugin().then(async () => {
+          this.checkConnectionsConsistency().then(async ok=>{
+            if(ok.result==false){
+              this.sql = await this.createConnection(this.dbName,false,'no-encryption',1);
+              await this.sql.open();
+              await this.sql.execute(createSchema);
+            }
+            this.initDone = true;
+          }).catch(()=>{});
+        });
       });
     });
   }

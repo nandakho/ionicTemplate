@@ -69,6 +69,13 @@ export class AuthService {
         return Promise.resolve({logStatus:"expired"});
       } else {
         this.isLoggedIn=true;
+        this.loggedUser = {
+          username:loggedUser['username'],
+          password:loggedUser['password'],
+          role:loggedUser['role'],
+          unit:loggedUser['unit'],
+          loginTime:loggedUser['loginTime']
+        }
         return Promise.resolve({logStatus:"ok",username:loggedUser['username']});
       }
     }
@@ -98,6 +105,6 @@ export interface currentUser{
   username: string;
   password: string;
   role: string;
-  unit?: string[];
+  unit: string[];
   loginTime: number;
 }

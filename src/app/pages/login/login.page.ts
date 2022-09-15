@@ -41,15 +41,11 @@ export class LoginPage implements OnInit {
     }, 100);
   }
 
-
   async loginUser(formlogin){
     if(await this.auth.login(formlogin.value)){
-      console.log("LOGIN SUKSES");
-      // Move to home page
+      this.misc.goTo('home',"root");
     } else {
       this.misc.showToast("Username atau Password salah!");
-      console.log("LOGIN FAIL");
-      // Rejected
     };
   }
 
