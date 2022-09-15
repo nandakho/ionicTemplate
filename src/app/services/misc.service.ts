@@ -8,6 +8,7 @@ import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
 })
 export class MiscService {
   camActive: boolean = false;
+  backSubs;
 
   constructor(
     private toast: ToastController,

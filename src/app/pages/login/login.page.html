@@ -28,7 +28,7 @@
             <ion-button size="large" type="submit" [disabled]="form.invalid" expand="block"><ion-icon name="log-out-outline"></ion-icon>&nbsp;Login</ion-button>
           </div>
           <div *ngIf="auth.isLoggedIn" [ngClass]="animRdy?'intro-fadeIn':'wait-fadeIn'" padding>
-            <ion-button (click)="misc.goTo('home')" expand="block"><ion-icon name="person-circle-outline"></ion-icon>&nbsp;Lanjutkan</ion-button>
+            <ion-button (click)="misc.goTo('/home','root')" expand="block"><ion-icon name="person-circle-outline"></ion-icon>&nbsp;Lanjutkan</ion-button>
             <ion-button size="small" (click)="auth.logout()" expand="block"><ion-icon name="log-out-outline"></ion-icon>&nbsp;Ganti User</ion-button>
           </div>
         </ion-col>
