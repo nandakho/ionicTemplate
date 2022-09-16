@@ -20,7 +20,7 @@ export class AppComponent {
       this.db.init();
     }
     const savedUser = await this.auth.savedUser();
-    if(savedUser.logStatus=="expired"){
+    if(savedUser.logStatus=="expired"||savedUser.logStatus=="not_login"){
       await this.misc.goTo("","root");
       this.misc.showToast("Login expired - Silahkan login kembali");
     }
