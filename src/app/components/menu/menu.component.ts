@@ -10,13 +10,19 @@ import { MiscService } from 'src/app/services/misc.service';
 })
 export class MenuComponent implements OnInit {
   @Input() indicator: boolean;
-  @Input() menuTitle: string;
-  @Input() menuIcon: string;
+  menuTitle: string;
+  menuIcon: string;
   user: string;
   role: string;
   unit: string;
-  pages:pageMenu[] = [
-    { title: 'Camera', icon: 'document', path: '/folder/Inbox', role: [false] }
+  //list pages yang masuk menu
+  pages:pageMenu[][] = [
+    [
+      { title: 'Halaman Utama', icon: 'home', path: '/home', role: [false] }
+    ],
+    [
+      { title: 'Camera', icon: 'document', path: '/folder/Inbox', role: [false] }
+    ]
   ]
 
   constructor(
@@ -29,17 +35,36 @@ export class MenuComponent implements OnInit {
   ){}
 
   async ngOnInit() {
-    this.menuCtrl.swipeGesture(false);
     await this.pf.ready();
+    await this.checkUser();
+    this.checkPage();
+  }
+
+  async checkUser(){
     if(this.auth.isLoggedIn){
       this.user = this.auth.loggedUser.username;
       this.role = this.auth.loggedUser.role;
       this.unit = this.auth.loggedUser.unit.join(" ");
+      return Promise.resolve();
     } else {
       if((await this.auth.savedUser()).logStatus=="ok"){
         this.user = this.auth.loggedUser.username;
         this.role = this.auth.loggedUser.role;
         this.unit = this.auth.loggedUser.unit.join(" ");
+        return Promise.resolve();
+      }
+    }
+  }
+
+  checkPage():void{
+    const loc = location.pathname;
+    for (let i = 0; i<this.pages.length; i++){
+      for (let ii = 0; ii<this.pages[i].length; ii++){
+        if(this.pages[i][ii].path==loc){
+          this.menuTitle = this.pages[i][ii].title;
+          this.menuIcon = this.pages[i][ii].icon;
+          return;
+        }
       }
     }
   }
@@ -69,6 +94,5 @@ interface pageMenu {
   title: string;
   icon: string;
   path: string;
-  role?: string[]|boolean[]; 
-  indicator?: boolean;
+  role?: (string|boolean)[];
 }

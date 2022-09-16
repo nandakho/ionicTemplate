@@ -24,20 +24,15 @@
         <b>Unit: {{unit}}</b><br>
       </ion-card-content>
     </ion-card> 
-    <ion-list>
-      <ion-menu-toggle auto-hide="false">
-        <ion-item button (click)="moveTo('/home')" lines="none" detail="false" [ngClass]="pf.doc.location.pathname=='/home'?'selected':''">
-          <ion-icon name="home" slot="start"></ion-icon>
-          <ion-label> Home</ion-label>
-        </ion-item>
-      </ion-menu-toggle>
-      <ion-menu-toggle *ngFor="let p of pages" auto-hide="false" (click)="closeMenu()">
+    <ion-list *ngFor="let list of pages">
+      <ion-menu-toggle *ngFor="let p of list" auto-hide="false">
         <ion-item button *ngIf="p.role.includes(role)||p.role[0]==false" (click)="moveTo(p.path)" [ngClass]="p.path==pf.doc.location.pathname?'selected':''" lines="none" detail="false">
           <ion-icon [name]="p.icon" slot="start"></ion-icon>
           <ion-label> {{p.title}}</ion-label>
         </ion-item>
       </ion-menu-toggle>
-      <ion-item-divider style="border-style:none"></ion-item-divider>
+    </ion-list>
+    <ion-list>
       <ion-menu-toggle auto-hide="false">
         <ion-item button (click)="logout()" lines="none" detail="false">
           <ion-icon name="log-out" slot="start"></ion-icon>
