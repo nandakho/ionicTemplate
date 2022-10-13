@@ -34,10 +34,14 @@ export class CameraComponent implements OnInit {
         });
       });
       this.option = this.params.get('option');
+      if(this.option.location){
+        this.misc.geoSubs.next(true);
+      }
       this.misc.camActive = true;
       this.capturing = false;
     }).catch(err=>{
       this.misc.showToast(err);
+      this.stopCamera();
     });
   }
 
@@ -76,7 +80,7 @@ export class CameraComponent implements OnInit {
   takePicture() {
     this.capturing = true;
     const cameraPreviewPictureOptions: CameraPreviewPictureOptions = {
-      quality: 100
+      quality: this.option.quality
     };
     CameraPreview.capture(cameraPreviewPictureOptions).then(result=>{
       const angle = this.orient=="landscape"&&this.lastPos=="front"?180:0;
@@ -84,7 +88,8 @@ export class CameraComponent implements OnInit {
       var background = new Image();
       background.src = "data:image/jpeg;base64,"+result.value;
       let ctx = canvasElement.getContext('2d');
-      background.onload = () => {
+      var loc = "";
+      background.onload = async () => {
         ctx.canvas.width  = background.width;
         ctx.canvas.height = background.height;
         ctx.translate(background.width / 2, background.height / 2);
@@ -93,28 +98,36 @@ export class CameraComponent implements OnInit {
         ctx.lineWidth = 5;
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "#000000";
-        if(this.option.time){
-          const locY = this.option.coord?background.height / 2 - 70:background.height / 2 - 30;
+        if(this.option.location){
+          loc = this.misc.curLocation();
+        }
+        if(this.option.timestamp){
           const timestamp = this.misc.curTimestamp();
           const fontSize = Math.floor(ctx.canvas.width/timestamp.length)<=Math.floor(ctx.canvas.height/timestamp.length)?Math.floor(ctx.canvas.width/timestamp.length):Math.floor(ctx.canvas.height/timestamp.length);
           var tsfont = "bold "+fontSize+"px Calibri";
           ctx.font = tsfont;
-          var width = ctx.measureText(timestamp);
+          var metrics = ctx.measureText(timestamp);
+          const width = metrics.width;
+          const fheight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+          const locY = this.option.location&&loc!=""?background.height / 2 - (2.5*fheight):background.height / 2 - fheight;
           ctx.rotate(angle * Math.PI / 180);
-          ctx.strokeText(timestamp, background.width / 2 - width['width'] - 20, locY);
-          ctx.fillText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.strokeText(timestamp, background.width / 2 - width - 20, locY);
+          ctx.fillText(timestamp, background.width / 2 - width - 20, locY);
           ctx.rotate(angle * Math.PI / 180);
         }
-        if(this.option.coord){
-          const locY = this.option.time?background.height / 2 - 20:background.height / 2 - 30;
-          const timestamp = this.misc.curTimestamp()+"XX";
-          const fontSize = Math.floor(ctx.canvas.width/timestamp.length)<=Math.floor(ctx.canvas.height/timestamp.length)?Math.floor(ctx.canvas.width/timestamp.length):Math.floor(ctx.canvas.height/timestamp.length);
-          var tsfont = "bold "+fontSize+"px Calibri";
-          ctx.font = tsfont;
-          var width = ctx.measureText(timestamp);
+        if(this.option.location&&loc!=""){
+          const fontSize = Math.floor(ctx.canvas.width/loc.length)<=Math.floor(ctx.canvas.height/loc.length)?Math.floor(ctx.canvas.width/loc.length):Math.floor(ctx.canvas.height/loc.length);
+          if(!this.option.timestamp){
+            var tsfont = "bold "+fontSize+"px Calibri";
+            ctx.font = tsfont;
+          }
+          var metrics = ctx.measureText(loc);
+          const width = metrics.width;
+          const fheight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+          const locY = background.height / 2 - fheight;
           ctx.rotate(angle * Math.PI / 180);
-          ctx.strokeText(timestamp, background.width / 2 - width['width'] - 20, locY);
-          ctx.fillText(timestamp, background.width / 2 - width['width'] - 20, locY);
+          ctx.strokeText(loc, background.width / 2 - width - 20, locY);
+          ctx.fillText(loc, background.width / 2 - width - 20, locY);
           ctx.rotate(angle * Math.PI / 180);
         }
         this.imageBase64 = canvasElement.toDataURL('image/jpeg');
@@ -124,9 +137,12 @@ export class CameraComponent implements OnInit {
   }
 
   stopCamera() {
-    CameraPreview.stop().then(()=>{
+    CameraPreview.stop().finally(()=>{
       screen.orientation.removeEventListener("change",this.orientChange);
       this.capturing = false;
+      if(this.misc.geoSubs.value){
+        this.misc.geoSubs.next(false);
+      }
       this.misc.camActive = false;
       this.modal.dismiss(this.imageBase64);
     });
@@ -143,10 +159,8 @@ export class CameraComponent implements OnInit {
   }
 }
 
-type picType = "URI"|"Base64";
-
 export interface picOpt {
-  time?: boolean;
-  coord?: boolean;
-  returnType?: picType;
+  timestamp?: boolean;
+  location?: boolean;
+  quality?: number;
 }

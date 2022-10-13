@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package kho.generic.template;
 
 import com.getcapacitor.BridgeActivity;
 

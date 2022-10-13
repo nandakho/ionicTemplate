@@ -1,0 +1,35 @@
+<app-menu></app-menu>
+
+<ion-content>
+  <ion-card>
+    <ion-accordion-group>
+      <ion-accordion *ngIf="listConfig.camera.includes(auth.loggedUser.role)||listConfig.camera[0]==false">
+        <ion-item slot="header">
+          <ion-label><b>Kamera</b><p style="margin-bottom:3px"></p><p>{{cameraOption.timestamp&&cameraOption.location?"Label Waktu dan Koordinat":cameraOption.timestamp?"Label Waktu":cameraOption.location?"Label Koordinat":"Tanpa Label"}}</p><p>{{"Kualitas Gambar: "+cameraOption.quality+"%"}}</p></ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content" style="padding-bottom:0px;padding-top:0px">
+          <form #formCam="ngForm" (ngSubmit)="saveCam(formCam)">
+            <ion-item lines="none">
+              <ion-label class="ion-no-margin" style="margin:8px 0px 8px 0px;font-size:smaller"><b>Label Waktu</b></ion-label>
+              <ion-checkbox class="ion-no-margin" style="margin:8px 0px 8px 0px" name="timestamp" [(ngModel)]="cameraOption.timestamp"></ion-checkbox>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-label class="ion-no-margin" style="margin:8px 0px 8px 0px;font-size:smaller"><b>Label Koordinat</b></ion-label>
+              <ion-checkbox class="ion-no-margin" style="margin:8px 0px 8px 0px" name="location" [(ngModel)]="cameraOption.location"></ion-checkbox>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-label  class="ion-no-margin" style="margin:8px 0px 0px 0px;font-size:smaller">
+                <b>Kualitas Gambar</b>
+                <ion-range  class="ion-no-margin" style="padding:0px" name="quality" min="0" max="100" [(ngModel)]="cameraOption.quality" [pin]="true" [pinFormatter]="pinFormatter">
+                  <ion-label slot="start">0</ion-label>
+                  <ion-label slot="end">100</ion-label>
+                </ion-range>
+              </ion-label>
+            </ion-item>
+            <ion-button style="padding-bottom:5px" type="submit" [disabled]="formCam.invalid" expand="block"><ion-icon name="save"></ion-icon>&nbsp;Simpan</ion-button>
+          </form>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-card>
+</ion-content>

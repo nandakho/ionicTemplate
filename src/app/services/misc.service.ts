@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ToastController, ModalController, NavController } from '@ionic/angular';
 import { CameraComponent, picOpt } from '../components/camera/camera.component';
 import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
+import { ConfigService } from './config.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +11,15 @@ import { Directory, Filesystem, WriteFileResult } from '@capacitor/filesystem';
 export class MiscService {
   camActive: boolean = false;
   backSubs;
+  geoSubs: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  geoSubsId: number;
+  geoLoc: loc;
 
   constructor(
     private toast: ToastController,
     private modal: ModalController,
-    private nav: NavController
+    private nav: NavController,
+    private config: ConfigService
   ) { }
 
   /**
@@ -56,6 +62,33 @@ export class MiscService {
       var now_sec = String(now.getSeconds());
     }
     return now_date + " " + now_month + " " + now_year + ", " + now_hour + ":" + now_min + ":" + now_sec;
+  }
+
+  /**
+   * Returns string of cached location
+   * @returns string
+   */
+   curLocation(): string {
+    const decimal = 5;
+    const divider = Math.pow(10,decimal);
+    if(!this.geoLoc){
+      return "";
+    }
+    if(this.geoLoc.lat<0){
+      var lat_dir = "S";
+      var lat_cord = Math.floor(this.geoLoc.lat*(-divider))/divider;
+    } else {
+      var lat_dir = "N";
+      var lat_cord = Math.floor(this.geoLoc.lat*divider)/divider;
+    }
+    if(this.geoLoc.long<0){
+      var long_dir = "W";
+      var long_cord = Math.floor(this.geoLoc.long*(-divider))/divider;
+    } else {
+      var long_dir = "E";
+      var long_cord = Math.floor(this.geoLoc.long*divider)/divider;
+    }
+    return lat_cord+lat_dir+"  "+long_cord+long_dir;
   }
 
   /**
@@ -109,28 +142,20 @@ export class MiscService {
    * @param message 
    * @param duration 
    */
-  showToast(message:string,duration:number=2000):void{
+   async showToast(message:string,duration:number=3000):Promise<void>{
     var allToast = document.querySelectorAll('ion-toast');
+    const newToast = await this.toast.create({message:message,duration:duration});
+    await newToast.present();
+    var newHeight = newToast.shadowRoot.children.item(0).getBoundingClientRect().height;
     if(allToast.length>0){
-      var prevHeight = allToast.item(allToast.length-1).shadowRoot.children.item(0).getBoundingClientRect().height;
       for (let index = 0; index < allToast.length; index++) {
         const element = allToast.item(index).getBoundingClientRect();
         allToast.item(index).style.position = "fixed";
-        allToast.item(index).style.top = String(element.top-(prevHeight)-2)+"px";
+        allToast.item(index).style.top = String(element.top-(newHeight)-2)+"px";
       }
     }
-    this.toast.create({message:message,duration:duration}).then(newToast=>{
-      newToast.present().then(()=>{
-        var newHeight = newToast.shadowRoot.children.item(0).getBoundingClientRect().height;
-        if(newHeight!=prevHeight){
-          for (let index = 0; index < allToast.length; index++) {
-            const element = allToast.item(index).getBoundingClientRect();
-            allToast.item(index).style.position = "fixed";
-            allToast.item(index).style.top = String(element.top-(Math.abs(newHeight-prevHeight)))+"px";
-          }
-        }
-      });
-    });
+    newToast.style.opacity = "100%";
+    return Promise.resolve();
   }
 
   /**
@@ -139,19 +164,20 @@ export class MiscService {
    * @param targetFolder 
    * @returns string|WriteFileResult
    */
-  openCam(opt:picOpt,targetFolder=""){
+   async openCam(returnType,targetFolder=""){
+    const defOpt:picOpt = await this.config.readConfig("camera") ?? { timestamp:true, location:false, quality:75 };
     var promise = new Promise(async (resolve,reject)=>{
       const modal = await this.modal.create({
         component: CameraComponent,
         animated: true,
         backdropDismiss: false,
-        componentProps: {option: opt}
+        componentProps: {option: defOpt}
       });
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           var dataURL = data.data.split(",");
           this.writeImage(dataURL[1],targetFolder).then(uri=>{
-            if(opt.returnType=="Base64"){
+            if(returnType=="Base64"){
               resolve(data.data);
             } else {
               resolve(uri);
@@ -168,4 +194,9 @@ export class MiscService {
     });
     return promise;
   }
+}
+
+export interface loc {
+  long: number;
+  lat: number;
 }

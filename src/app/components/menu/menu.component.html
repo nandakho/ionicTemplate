@@ -3,7 +3,7 @@
     <ion-buttons slot="start" (click)="openMenu()" style="margin-left:18px"><ion-icon name="menu-sharp"></ion-icon>
     </ion-buttons>
     <ion-title><ion-icon [name]="menuIcon"></ion-icon> {{menuTitle}}</ion-title>
-    <ion-buttons slot="primary" *ngIf="indicator" (click)="misc.showToast('Tarik halaman ke bawah untuk menyegarkan koneksi')">
+    <ion-buttons slot="primary" *ngIf="indicator" (click)="misc.showToast('Koneksi akan diperbarui otomatis secara berkala')">
       <ion-button *ngIf="indicator==1" color="success">Terhubung:<ion-icon name="checkmark"></ion-icon></ion-button>
       <ion-button *ngIf="indicator==0" color="danger">Terhubung:<ion-icon name="close"></ion-icon></ion-button>
     </ion-buttons>
@@ -24,9 +24,9 @@
         <b>Unit: {{unit}}</b><br>
       </ion-card-content>
     </ion-card> 
-    <ion-list *ngFor="let list of pages">
-      <ion-menu-toggle *ngFor="let p of list" auto-hide="false">
-        <ion-item button *ngIf="p.role.includes(role)||p.role[0]==false" (click)="moveTo(p.path)" [ngClass]="p.path==pf.doc.location.pathname?'selected':''" lines="none" detail="false">
+    <ion-list *ngFor="let list of userMenu">
+      <ion-menu-toggle *ngFor="let p of list;let i = index" auto-hide="false">
+        <ion-item button (click)="moveTo(p.path)" [ngClass]="p.path.split('/')[1]==pf.doc.location.pathname.split('/')[1]?'selected':''" lines="none" detail="false">
           <ion-icon [name]="p.icon" slot="start"></ion-icon>
           <ion-label> {{p.title}}</ion-label>
         </ion-item>

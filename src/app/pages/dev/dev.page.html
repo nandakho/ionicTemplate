@@ -1,0 +1,39 @@
+<app-menu></app-menu>
+
+<ion-content [fullscreen]="true">
+  <div style="text-align:center;margin-top:20px;margin-bottom:20px">
+    <ion-button (click)="toast()">Show Toast</ion-button>
+    <ion-button (click)="openCam()">Open Cam</ion-button>
+  </div>
+  
+  <div>
+    <ion-card>
+      <ion-card-content>
+        <ion-card-title><b>Test Query</b></ion-card-title>
+        <form #sql="ngForm" (ngSubmit)="testQuery(sql)">
+          <ion-item>
+            <ion-label position="floating">What</ion-label>
+            <ion-input name="what" [(ngModel)]="qForm.what"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">From</ion-label>
+            <ion-input name="from" [(ngModel)]="qForm.from"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Where</ion-label>
+            <ion-input name="where" [(ngModel)]="qForm.where"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Manual Query</ion-label>
+            <ion-input name="manual" [(ngModel)]="qForm.manual"></ion-input>
+          </ion-item>
+          <ion-button type="submit" expand="block"><ion-icon name="flask"></ion-icon>Start</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="img" style="width:80%;left:10%;position:absolute;border:4px solid black;padding:4px 4px 0px 4px">
+    <img [src]="img">
+  </div>
+</ion-content>

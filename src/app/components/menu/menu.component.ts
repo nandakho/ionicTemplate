@@ -9,7 +9,7 @@ import { MiscService } from 'src/app/services/misc.service';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
-  @Input() indicator: boolean;
+  @Input() indicator: number;
   menuTitle: string;
   menuIcon: string;
   user: string;
@@ -18,12 +18,14 @@ export class MenuComponent implements OnInit {
   //list pages yang masuk menu
   pages:pageMenu[][] = [
     [
-      { title: 'Halaman Utama', icon: 'home', path: '/home', role: [false] }
+      { title: 'Halaman Utama', icon: 'home', path: '/home', role: [false] },
+      { title: 'Dev Menu', icon: 'bug', path: '/dev/testing', role: [this.auth.role[0]] }
     ],
     [
-      { title: 'Camera', icon: 'document', path: '/folder/Inbox', role: [false] }
+      { title: 'Setting', icon: 'construct', path: '/setting', role: [false] }
     ]
   ]
+  userMenu:pageMenu[][] = [[],[],[]];
 
   constructor(
     private pf: Platform,
@@ -38,9 +40,10 @@ export class MenuComponent implements OnInit {
     await this.pf.ready();
     await this.checkUser();
     this.checkPage();
+    this.checkWhatMenu();
   }
 
-  async checkUser(){
+  async checkUser(): Promise<void>{
     if(this.auth.isLoggedIn){
       this.user = this.auth.loggedUser.username;
       this.role = this.auth.loggedUser.role;
@@ -56,11 +59,26 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  checkWhatMenu(): void{
+    for(let i = 0;i<this.pages.length;i++){
+      for(let ii = 0;ii<this.pages[i].length;ii++){
+        if(this.pages[i][ii].role.includes(this.role)||this.pages[i][ii].role[0]==false){
+          this.userMenu[i].push(this.pages[i][ii]);
+        }
+      }
+    }
+    for(let i = 0;i<this.userMenu.length;i++){
+      if(this.userMenu[i].length==0){
+        this.userMenu.splice(i,1);
+      }
+    }
+  }
+
   checkPage():void{
     const loc = location.pathname;
     for (let i = 0; i<this.pages.length; i++){
       for (let ii = 0; ii<this.pages[i].length; ii++){
-        if(this.pages[i][ii].path==loc){
+        if(this.pages[i][ii].path.split("/")[1]==loc.split("/")[1]){
           this.menuTitle = this.pages[i][ii].title;
           this.menuIcon = this.pages[i][ii].icon;
           return;

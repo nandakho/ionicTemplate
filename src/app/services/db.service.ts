@@ -16,7 +16,8 @@ export class DbService {
   platform: string;
   sqlitePlugin: any;
   native: boolean = false;
-  appVer: version = { major:0, minor:0, patch:0 };
+  appVer: version = { major:0, minor:0, patch:1 };
+  appId: string = "kan.sisipan.om";
   //Editable
   dbName: string = "db";
   appTitle: string = "General Template";
@@ -27,27 +28,30 @@ export class DbService {
    */
   init(){
     this.pf.ready().then(async () => {
-      App.getInfo().then((info)=>{
-        var v = info.version.split("-");
-        var vnumber = v[0].split(".");
-        v.splice(0,1);
-        var vnotes = v.join("-");
-        this.appVer = {
-          major:parseInt(vnumber[0]),
-          minor:parseInt(vnumber[1]),
-          patch:parseInt(vnumber[2])
-        }
-        this.appVer.notes = vnotes?vnotes:null;
-        this.initializePlugin().then(async () => {
-          this.checkConnectionsConsistency().then(async ok=>{
-            if(ok.result==false){
-              this.sql = await this.createConnection(this.dbName,false,'no-encryption',1);
-              await this.sql.open();
-              await this.sql.execute(createSchema);
+      this.initializePlugin().then(() => {
+        if(this.native){
+          App.getInfo().then((info)=>{
+            this.appId = info.id;
+            var v = info.version.split("-");
+            var vnumber = v[0].split(".");
+            v.splice(0,1);
+            var vnotes = v.join("-");
+            this.appVer = {
+              major:parseInt(vnumber[0]),
+              minor:parseInt(vnumber[1]),
+              patch:parseInt(vnumber[2])
             }
-            this.initDone = true;
-          }).catch(()=>{});
-        });
+            this.appVer.notes = vnotes?vnotes:null;
+          });
+        }
+        this.checkConnectionsConsistency().then(async ok=>{
+          if(ok.result==false){
+            this.sql = await this.createConnection(this.dbName,false,'no-encryption',1);
+            await this.sql.open();
+            await this.sql.execute(createSchema);
+          }
+          this.initDone = true;
+        }).catch(()=>{});
       });
     });
   }
@@ -364,6 +368,7 @@ export class DbService {
           encrypted,
           mode,
           version,
+          false
         );
         if (db != null) {
           return Promise.resolve(db);
@@ -385,7 +390,7 @@ export class DbService {
   async closeConnection(database: string): Promise<void> {
     if (this.sqlite != null) {
       try {
-        await this.sqlite.closeConnection(database);
+        await this.sqlite.closeConnection(database,false);
         return Promise.resolve();
       } catch (err) {
         return Promise.reject(new Error(err));
@@ -402,7 +407,7 @@ export class DbService {
   async retrieveConnection(database: string): Promise<SQLiteDBConnection> {
     if (this.sqlite != null) {
       try {
-        return Promise.resolve(await this.sqlite.retrieveConnection(database));
+        return Promise.resolve(await this.sqlite.retrieveConnection(database,false));
       } catch (err) {
         return Promise.reject(new Error(err));
       }
@@ -449,7 +454,7 @@ export class DbService {
   async isConnection(database: string): Promise<capSQLiteResult> {
     if (this.sqlite != null) {
       try {
-        return Promise.resolve(await this.sqlite.isConnection(database));
+        return Promise.resolve(await this.sqlite.isConnection(database,false));
       } catch (err) {
         return Promise.reject(new Error(err));
       }

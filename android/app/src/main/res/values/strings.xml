@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">cam</string>
-    <string name="title_activity_main">cam</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="app_name">Template Nandakho</string>
+    <string name="title_activity_main">Template Nandakho</string>
+    <string name="package_name">kho.generic.template</string>
+    <string name="custom_url_scheme">kho.generic.template</string>
 </resources>

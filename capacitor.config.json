@@ -1,6 +1,6 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "cam",
+	"appId": "kho.generic.template",
+	"appName": "Template Nandakho",
 	"webDir": "www",
 	"bundledWebRuntime": false
 }

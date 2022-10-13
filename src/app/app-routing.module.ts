@@ -8,8 +8,8 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'folder/:id',
-    loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
+    path: 'dev/:id',
+    loadChildren: () => import('./pages/dev/dev.module').then( m => m.DevPageModule)
   },
   {
     path: 'login',
@@ -18,7 +18,11 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
+  },  {
+    path: 'setting',
+    loadChildren: () => import('./pages/setting/setting.module').then( m => m.SettingPageModule)
   }
+
 
 ];
 

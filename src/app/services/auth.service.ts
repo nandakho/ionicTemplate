@@ -32,7 +32,7 @@ export class AuthService {
     if(username == "admin" && password=="dd94709528bb1c83d08f3088d4043f4742891f4f"){
       this.loggedUser = {
         username: username,
-        password: this.saltedPass(password),
+        password: password,
         role: this.role[0],
         unit: ['ALL'],
         loginTime: Date.now()
