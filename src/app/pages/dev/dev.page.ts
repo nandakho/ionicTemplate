@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MiscService } from '../../services/misc.service';
-import { DbService } from 'src/app/services/db.service';
+import { DbService, MiscService } from 'src/app/services';
 
 @Component({
   selector: 'app-dev',
@@ -54,10 +53,15 @@ export class DevPage implements OnInit {
   }
 
   openCam(){
+    this.misc.camActive = true;
+    this.misc.backSubs.next(false);
     this.misc.openCam("Base64").then(res=>{
       this.img = res; //for testing
     }).catch((err)=>{
       this.misc.showToast(err);
+    }).finally(()=>{
+      this.misc.camActive = false;
+      this.misc.backSubs.next(true);
     });
   }
 }

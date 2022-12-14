@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SHA1 } from 'crypto-js';
-import { ConfigService } from './config.service';
-import { DbService } from './db.service';
+import { DbService, ConfigService, MiscService } from '.';
+import { CanActivate, ActivatedRouteSnapshot } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +10,21 @@ export class AuthService {
   public isLoggedIn: boolean = false;
   public loggedUser: currentUser;
   public role: string[] = ['admin'];
+  public pages:pageMenu[][] = [
+    [
+      { title: 'Halaman Utama', icon: 'home', path: '/home', role: [false] },
+      { title: 'Dev Menu', icon: 'bug', path: '/dev/testing', role: [this.role[0]] }
+    ],
+    [
+      { title: 'Sinkronisasi', icon: 'sync', path: '/sync', role: [false] },
+      { title: 'Setting', icon: 'construct', path: '/setting', role: [this.role[0]] }
+    ]
+  ];
+
   constructor(
     private config: ConfigService,
-    private db: DbService
+    private db: DbService,
+    private misc: MiscService
   ) { }
   
   saltedPass(pass:string):string{
@@ -39,7 +51,7 @@ export class AuthService {
       };
     } else {
       const where = `username="${username}" AND password="${password}"`;
-      const usrFound = await this.db.select({what:["*"],from:'users',where:where,orderby:"username",orderdir:"ASC"});
+      const usrFound = await this.db.select({what:["*"],from:'user',where:where,orderby:"username",orderdir:"ASC"});
       if(usrFound.length<1){
         return Promise.resolve(false);
       } else {
@@ -89,7 +101,37 @@ export class AuthService {
     }
     return Promise.reject();
   }
+
+  async canAccess(target:string): Promise<boolean>{
+    var canI = false;
+    if(this.isLoggedIn){
+      for(let i = 0; i<this.pages.length; i++){
+        this.pages[i].filter(obj=>{
+          if(obj.path.split("/")[1]==target && (obj.role.includes(false)||obj.role.includes(this.loggedUser.role))){
+            canI = true;
+          }
+        });
+      }
+    }
+    if(!canI){
+      this.misc.showToast("User anda tidak memiliki otorisasi untuk mengakses halaman ini!");
+      await this.misc.goTo("/","root");
+    }
+    return Promise.resolve(canI);
+  }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService) {}
+  async canActivate(route: ActivatedRouteSnapshot) {
+    const can = await this.authService.canAccess(route.routeConfig.path.split("/")[0]);
+    return can;
+  }
+}
+
 
 export interface loggedUser {
   logStatus: "not_login"|"ok"|"expired";
@@ -107,4 +149,11 @@ export interface currentUser{
   role: string;
   unit: string[];
   loginTime: number;
+}
+
+export interface pageMenu {
+  title: string;
+  icon: string;
+  path: string;
+  role?: (string|boolean)[];
 }

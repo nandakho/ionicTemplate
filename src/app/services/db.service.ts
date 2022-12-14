@@ -3,7 +3,7 @@ import { Platform } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteDBConnection, SQLiteConnection, capSQLiteChanges, capSQLiteValues, capEchoResult, capSQLiteResult, capNCDatabasePathResult } from '@capacitor-community/sqlite';
 import { App } from '@capacitor/app';
-import { createSchema } from 'src/app/services/db.schema';
+import { createSchema } from 'src/app/services';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +17,10 @@ export class DbService {
   sqlitePlugin: any;
   native: boolean = false;
   appVer: version = { major:0, minor:0, patch:1 };
-  appId: string = "kan.sisipan.om";
+  appId: string = "kho.generic.template";
   //Editable
   dbName: string = "db";
+  prefix: string = "db_";
   appTitle: string = "General Template";
   constructor(private pf: Platform) { }
 
@@ -56,12 +57,17 @@ export class DbService {
     });
   }
 
+  /**
+   * Select query builder
+   * @param opt:selectOption
+   * @returns object
+   */
   async select(opt:selectOption):Promise<any[]>{
     var selected = opt.what.join(",");
     if(opt.distinct===true){
       selected = " DISTINCT "+selected;
     }
-    var q = `SELECT ${selected} FROM ${opt.from}`;
+    var q = `SELECT ${selected} FROM ${this.prefix}${opt.from}`;
     if(opt.where){
       q +=` WHERE `+opt.where;
     }
@@ -74,6 +80,45 @@ export class DbService {
     try {
       const result = await this.sql.query(q);
       return Promise.resolve(result.values);
+    } catch (err) {
+      return Promise.reject(new Error(err));
+    }
+  }
+
+  /**
+   * Insert query builder
+   * @param opt:insertOption
+   * @returns Promise<boolean>
+   */
+  async insert(opt:insertOption): Promise<boolean>{
+    var values = opt.values.join("','");
+    var q = `INSERT INTO ${this.prefix}${opt.into}`;
+    if(opt.column){
+      const col = opt.column.join(",");
+      q += `(${col})`;
+    }
+    q += ` VALUES('${values}')`;
+    try {
+      const result = await this.sql.query(q);
+      return Promise.resolve(true);
+    } catch (err) {
+      return Promise.reject(new Error(err));
+    }
+  }
+
+  /**
+   * Delete query builder
+   * @param opt:deleteOption
+   * @returns Promise<boolean>
+   */
+  async purge(opt:deleteOption): Promise<boolean>{
+    var q = `DELETE FROM ${this.prefix}${opt.from}`;
+    if(opt.where){
+      q += ` WHERE ${opt.where}`;
+    }
+    try {
+      const result = await this.sql.query(q);
+      return Promise.resolve(true);
     } catch (err) {
       return Promise.reject(new Error(err));
     }
@@ -696,4 +741,15 @@ export interface selectOption {
   where?: string;
   orderby?: string;
   orderdir?: "ASC"|"DESC";
+}
+
+export interface deleteOption {
+  from: string;
+  where?: string;
+}
+
+export interface insertOption {
+  into: string;
+  column?: string[];
+  values: string[];
 }
