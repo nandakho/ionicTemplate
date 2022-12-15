@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { NavController, MenuController, Platform } from '@ionic/angular';
-import { DbService } from 'src/app/services/db.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { MiscService } from 'src/app/services/misc.service';
+import { DbService, AuthService, MiscService, pageMenu } from 'src/app/services';
+
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
@@ -15,16 +14,7 @@ export class MenuComponent implements OnInit {
   user: string;
   role: string;
   unit: string;
-  //list pages yang masuk menu
-  pages:pageMenu[][] = [
-    [
-      { title: 'Halaman Utama', icon: 'home', path: '/home', role: [false] },
-      { title: 'Dev Menu', icon: 'bug', path: '/dev/testing', role: [this.auth.role[0]] }
-    ],
-    [
-      { title: 'Setting', icon: 'construct', path: '/setting', role: [false] }
-    ]
-  ]
+  pages:pageMenu[][] = this.auth.pages;
   userMenu:pageMenu[][] = [[],[],[]];
 
   constructor(
@@ -88,9 +78,15 @@ export class MenuComponent implements OnInit {
   }
 
   async moveTo(destination){
-    await this.menuCtrl.close().then(async ()=>{
-      await this.navCtrl.navigateRoot(destination);
-    });
+    if(this.misc.onSync){
+      this.misc.showToast("Harap menunggu proses sinkronisasi selesai!");
+      return;
+    }
+    if(destination.split("/")[1]!=location.pathname.split("/")[1]){
+      await this.menuCtrl.close().then(async ()=>{
+        await this.navCtrl.navigateRoot(destination);
+      });
+    }
   }
 
   async openMenu(){
@@ -102,15 +98,12 @@ export class MenuComponent implements OnInit {
   }
 
   async logout(){
+    if(this.misc.onSync){
+      this.misc.showToast("Harap menunggu proses sinkronisasi selesai!");
+      return;
+    }
     await this.auth.logout();
     await this.navCtrl.navigateRoot('/login');
     this.misc.showToast("Anda telah logout!");
   }
-}
-
-interface pageMenu {
-  title: string;
-  icon: string;
-  path: string;
-  role?: (string|boolean)[];
 }

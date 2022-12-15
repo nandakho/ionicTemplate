@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CameraPosition, CameraPreview, CameraPreviewOptions, CameraPreviewPictureOptions } from '@capacitor-community/camera-preview';
 import { ModalController, NavParams } from '@ionic/angular';
-import { MiscService } from 'src/app/services/misc.service';
+import { MiscService } from 'src/app/services';
 
 @Component({
   selector: 'app-camera',
