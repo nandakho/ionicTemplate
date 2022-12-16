@@ -3,6 +3,23 @@
 <ion-content>
   <ion-card>
     <ion-accordion-group>
+      <ion-accordion *ngIf="listConfig.ip.includes(auth.loggedUser.role)||listConfig.ip[0]==false">
+        <ion-item slot="header">
+          <ion-label><b>Alamat Server</b><p style="margin-bottom:3px"></p><p>{{api.apiAddr}}</p></ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content" style="padding-top:0px;padding-bottom:0px;">
+          <form #form="ngForm" (ngSubmit)="saveIP(form)">
+            <ion-item style="padding-bottom:5px">
+              <ion-label position="floating"><b>Alamat Server Baru</b></ion-label>
+              <ion-input [disabled]="apiTesting" name="addr" type="url" [(ngModel)]="addr" placeholder="http://host.example.domain" required></ion-input>
+              <ion-button slot="end" expand="block" style="margin:4px 0px 0px 0px;font-size:larger;height:80%" type="submit" [disabled]="form.invalid||apiTesting">
+                <ion-icon name="save" *ngIf="!apiTesting"></ion-icon>
+                <ion-spinner name="circles" *ngIf="apiTesting"></ion-spinner>
+              </ion-button>
+            </ion-item>
+          </form>
+        </div>
+      </ion-accordion>
       <ion-accordion *ngIf="listConfig.camera.includes(auth.loggedUser.role)||listConfig.camera[0]==false">
         <ion-item slot="header">
           <ion-label><b>Kamera</b><p style="margin-bottom:3px"></p><p>{{cameraOption.timestamp&&cameraOption.location?"Label Waktu dan Koordinat":cameraOption.timestamp?"Label Waktu":cameraOption.location?"Label Koordinat":"Tanpa Label"}}</p><p>{{"Kualitas Gambar: "+cameraOption.quality+"%"}}</p></ion-label>

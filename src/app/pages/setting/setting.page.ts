@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MiscService } from 'src/app/services/misc.service';
-import { ConfigService } from 'src/app/services/config.service';
-import { AuthService } from 'src/app/services/auth.service';
+import { MiscService, ConfigService, ApiService, AuthService } from 'src/app/services';
 
 @Component({
   selector: 'app-setting',
@@ -9,8 +7,11 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./setting.page.scss'],
 })
 export class SettingPage implements OnInit {
+  addr: string;
+  apiTesting: boolean = false;
   listConfig:configRole = {
-    camera: [false]
+    camera: [false],
+    ip: ['admin']
   }
   cameraOption = {
     timestamp:true,
@@ -21,13 +22,43 @@ export class SettingPage implements OnInit {
   constructor(
     private misc: MiscService,
     private config: ConfigService,
+    private api: ApiService,
     private auth: AuthService
   ) { }
 
   ngOnInit() {
+    this.readIPConfig();
     this.readCamConfig();
   }
 
+  //IP CONFIG
+    async readIPConfig(){
+      const addr = await this.config.readConfig('apiAddress');
+      if(addr){
+        this.api.apiAddr = addr['address'];
+      }
+      this.apiTesting = false;
+    }
+
+    async saveIP(form){
+      this.apiTesting = true;
+      try {
+        const resp = await this.api.connectTest(form.value.addr);
+        this.apiTesting = false;
+        if(resp){
+          if(await this.config.writeConfig('apiAddress',{address:form.value.addr})){
+            this.api.apiAddr = form.value.addr;
+            this.misc.showToast("Alamat Server berhasil diubah!");
+          } else {
+            this.misc.showToast("Gagal menyimpan perubahan");
+          }
+        }
+      } catch (err) {
+        this.apiTesting = false;
+        this.misc.showToast(err); 
+      }
+    }
+  
   //CAM CONFIG
     async readCamConfig(){
       const conf = await this.config.readConfig('camera');
