@@ -21,4 +21,5 @@ Template Ionic / Angular / Capacitor dengan default halaman:
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-feature android:name="android.hardware.location.gps" />
 ```  
-- Kelar semua, tinggal run deh, `ionic cap run android -l --target [device_id]`
+- Compile asset, `ionic cap sync`  
+- Setelah kelar semua, tinggal tes run deh, `ionic cap run android -l --target [device_id]`
